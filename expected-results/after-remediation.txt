@@ -1,0 +1,9 @@
+┌──────────────────────────────┬──────────────────┐
+│          check_name          │ remaining_issues │
+├──────────────────────────────┼──────────────────┤
+│ duplicate_emails             │ 0                │
+│ missing_assignees            │ 0                │
+│ invalid_statuses             │ 0                │
+│ terminal_without_resolved_at │ 0                │
+│ inactive_privileged_users    │ 0                │
+└──────────────────────────────┴──────────────────┘

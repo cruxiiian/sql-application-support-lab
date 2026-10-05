@@ -1,0 +1,146 @@
+
+===== queries/01_users_and_permissions.sql =====
+┌─────────┬──────────────┬─────────────────────────────┬────────────────┬─────────────────────┐
+│ user_id │  full_name   │            email            │ account_status │        team         │
+├─────────┼──────────────┼─────────────────────────────┼────────────────┼─────────────────────┤
+│ 101     │ Aisha Rahman │ aisha.rahman@example.com    │ active         │ Application Support │
+│ 102     │ Ben Carter   │ ben.carter@example.com      │ active         │ Application Support │
+│ 103     │ Chloe Evans  │ chloe.evans@example.com     │ suspended      │ Application Support │
+│ 104     │ Daniel Wong  │ daniel.wong@example.com     │ active         │ Finance Systems     │
+│ 105     │ Emma Lewis   │ emma.lewis@example.com      │ active         │ Service Desk        │
+│ 106     │ Daniel W.    │   DANIEL.WONG@example.com   │ active         │ Finance Systems     │
+│ 107     │ Farah Ali    │ farah.ali@example.com       │ active         │ Application Support │
+└─────────┴──────────────┴─────────────────────────────┴────────────────┴─────────────────────┘
+┌─────────┬──────────────┬───────────────┬─────────────────┐
+│ user_id │  full_name   │   role_name   │ permission_code │
+├─────────┼──────────────┼───────────────┼─────────────────┤
+│ 101     │ Aisha Rahman │ Administrator │ audit.export    │
+│ 101     │ Aisha Rahman │ Administrator │ case.close      │
+│ 101     │ Aisha Rahman │ Administrator │ case.edit       │
+│ 101     │ Aisha Rahman │ Administrator │ case.view       │
+│ 101     │ Aisha Rahman │ Administrator │ user.manage     │
+│ 102     │ Ben Carter   │ Support Agent │ case.close      │
+│ 102     │ Ben Carter   │ Support Agent │ case.edit       │
+│ 102     │ Ben Carter   │ Support Agent │ case.view       │
+│ 103     │ Chloe Evans  │ Administrator │ audit.export    │
+│ 103     │ Chloe Evans  │ Administrator │ case.close      │
+│ 103     │ Chloe Evans  │ Administrator │ case.edit       │
+│ 103     │ Chloe Evans  │ Administrator │ case.view       │
+│ 103     │ Chloe Evans  │ Administrator │ user.manage     │
+│ 104     │ Daniel Wong  │ Read Only     │ case.view       │
+│ 105     │ Emma Lewis   │ Read Only     │ case.view       │
+│ 107     │ Farah Ali    │ Support Agent │ case.close      │
+│ 107     │ Farah Ali    │ Support Agent │ case.edit       │
+│ 107     │ Farah Ali    │ Support Agent │ case.view       │
+└─────────┴──────────────┴───────────────┴─────────────────┘
+┌─────────┬─────────────┬────────────────┬───────────────┐
+│ user_id │  full_name  │ account_status │   role_name   │
+├─────────┼─────────────┼────────────────┼───────────────┤
+│ 103     │ Chloe Evans │ suspended      │ Administrator │
+└─────────┴─────────────┴────────────────┴───────────────┘
+
+===== queries/02_cases_and_audit.sql =====
+┌─────────┬──────────┬──────────────────┬──────────────┬───────────────────────┬──────────────────────────────┐
+│ case_id │ priority │      status      │  requester   │       assignee        │            title             │
+├─────────┼──────────┼──────────────────┼──────────────┼───────────────────────┼──────────────────────────────┤
+│ 1002    │ critical │ in_progress      │ Daniel Wong  │ Farah Ali             │ Finance export times out     │
+│ 1004    │ high     │ closed           │ Daniel Wong  │ Ben Carter            │ Duplicate charge displayed   │
+│ 1001    │ high     │ open             │ Emma Lewis   │ Ben Carter            │ SSO login loop               │
+│ 1003    │ medium   │ open             │ Emma Lewis   │ UNASSIGNED OR MISSING │ Password reset email missing │
+│ 1005    │ medium   │ waiting_customer │ Emma Lewis   │ Farah Ali             │ Mobile session expires early │
+│ 1007    │ medium   │ pending          │ Daniel W.    │ Ben Carter            │ Cannot update profile        │
+│ 1006    │ low      │ resolved         │ Aisha Rahman │ Ben Carter            │ Audit export missing actor   │
+│ 1008    │ low      │ resolved         │ Emma Lewis   │ Farah Ali             │ Dashboard widget blank       │
+└─────────┴──────────┴──────────────────┴──────────────┴───────────────────────┴──────────────────────────────┘
+┌──────────┬─────────────────────┬─────────────┬────────────────┬───────────┬─────────────┬───────────────────────────────────────┐
+│ audit_id │      action_at      │    actor    │  action_type   │ old_value │  new_value  │                 note                  │
+├──────────┼─────────────────────┼─────────────┼────────────────┼───────────┼─────────────┼───────────────────────────────────────┤
+│ 5003     │ 2026-09-29 10:15:00 │ Daniel Wong │ CASE_CREATED   │           │ open        │                                       │
+│ 5004     │ 2026-09-29 10:45:00 │ Farah Ali   │ STATUS_CHANGED │ open      │ in_progress │ Reproduced against month-end dataset. │
+└──────────┴─────────────────────┴─────────────┴────────────────┴───────────┴─────────────┴───────────────────────────────────────┘
+┌─────────────┬────────────┐
+│   status    │ case_count │
+├─────────────┼────────────┤
+│ open        │ 2          │
+│ in_progress │ 1          │
+│ pending     │ 1          │
+└─────────────┴────────────┘
+┌─────────┬────────────┬──────────────┐
+│ user_id │ full_name  │ active_cases │
+├─────────┼────────────┼──────────────┤
+│ 102     │ Ben Carter │ 2            │
+└─────────┴────────────┴──────────────┘
+
+===== queries/03_data_quality_checks.sql =====
+┌─────────────────────────┬─────────────────┬──────────┐
+│    normalised_email     │ duplicate_count │ user_ids │
+├─────────────────────────┼─────────────────┼──────────┤
+│ daniel.wong@example.com │ 2               │ 104,106  │
+└─────────────────────────┴─────────────────┴──────────┘
+┌─────────┬──────────────────┬──────────────────────────────┐
+│ case_id │ assigned_user_id │            title             │
+├─────────┼──────────────────┼──────────────────────────────┤
+│ 1003    │ 999              │ Password reset email missing │
+└─────────┴──────────────────┴──────────────────────────────┘
+┌─────────┬──────────────────┬──────────────────────────────┐
+│ case_id │      status      │            title             │
+├─────────┼──────────────────┼──────────────────────────────┤
+│ 1005    │ waiting_customer │ Mobile session expires early │
+└─────────┴──────────────────┴──────────────────────────────┘
+┌─────────┬────────┬─────────────┬────────────────────────────┐
+│ case_id │ status │ resolved_at │           title            │
+├─────────┼────────┼─────────────┼────────────────────────────┤
+│ 1004    │ closed │             │ Duplicate charge displayed │
+└─────────┴────────┴─────────────┴────────────────────────────┘
+┌─────────┬─────────────┬────────────────┬───────────────┐
+│ user_id │  full_name  │ account_status │   role_name   │
+├─────────┼─────────────┼────────────────┼───────────────┤
+│ 103     │ Chloe Evans │ suspended      │ Administrator │
+└─────────┴─────────────┴────────────────┴───────────────┘
+┌───────┬───────┬───────────────┬──────┐
+│ table │ rowid │    parent     │ fkid │
+├───────┼───────┼───────────────┼──────┤
+│ cases │ 1003  │ users         │ 0    │
+│ cases │ 1005  │ case_statuses │ 2    │
+└───────┴───────┴───────────────┴──────┘
+
+===== queries/04_safe_query_examples.sql =====
+┌─────────┬────────────────────────────┬──────────┬─────────────────────┐
+│ case_id │           title            │ priority │     created_at      │
+├─────────┼────────────────────────────┼──────────┼─────────────────────┤
+│ 1004    │ Duplicate charge displayed │ high     │ 2026-09-21 09:30:00 │
+│ 1001    │ SSO login loop             │ high     │ 2026-09-28 08:20:00 │
+│ 1002    │ Finance export times out   │ critical │ 2026-09-29 10:15:00 │
+└─────────┴────────────────────────────┴──────────┴─────────────────────┘
+┌─────────┬──────────────────────────────┬────────────┐
+│ case_id │            title             │  assignee  │
+├─────────┼──────────────────────────────┼────────────┤
+│ 1001    │ SSO login loop               │ Ben Carter │
+│ 1002    │ Finance export times out     │ Farah Ali  │
+│ 1003    │ Password reset email missing │            │
+│ 1004    │ Duplicate charge displayed   │ Ben Carter │
+│ 1005    │ Mobile session expires early │ Farah Ali  │
+│ 1006    │ Audit export missing actor   │ Ben Carter │
+│ 1007    │ Cannot update profile        │ Ben Carter │
+│ 1008    │ Dashboard widget blank       │ Farah Ali  │
+└─────────┴──────────────────────────────┴────────────┘
+┌──────────────────┬───────────────────┐
+│ assigned_user_id │ active_case_count │
+├──────────────────┼───────────────────┤
+│ 102              │ 2                 │
+│ 999              │ 1                 │
+│ 107              │ 1                 │
+└──────────────────┴───────────────────┘
+┌─────────┬────────────────────────┬──────────────────┐
+│ case_id │         title          │ hours_to_resolve │
+├─────────┼────────────────────────┼──────────────────┤
+│ 1008    │ Dashboard widget blank │ 27.3             │
+└─────────┴────────────────────────┴──────────────────┘
+┌─────────┬──────────────┐
+│ user_id │  full_name   │
+├─────────┼──────────────┤
+│ 101     │ Aisha Rahman │
+│ 104     │ Daniel Wong  │
+│ 105     │ Emma Lewis   │
+│ 106     │ Daniel W.    │
+└─────────┴──────────────┘
